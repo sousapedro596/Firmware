@@ -301,7 +301,7 @@ int NVS::configure(unsigned &baudrate)
 		write(_fd, (const void *)msg5, 5);
 		usleep(50);
 
-		receive(200);
+		receive(400);
 
 		if (_configured) {		// _configured flag are changed in xc2cfg_decode in response to B2h message
 			return 0;
@@ -439,11 +439,18 @@ int NVS::x88pvt_decode()
 
 	//Fills the struct with time
 	_gps_position->time_utc_usec = ((uint64_t)(time.time) * 1000000) + (uint64_t)(time.sec) * 1000  ; //TODO: test this
-	_gps_position->timestamp_position = _gps_position->time_utc_usec;
+	//_gps_position->timestamp_position = _gps_position->time_utc_usec;
+	_gps_position->timestamp_position = hrt_absolute_time();
 
 
 
 	byte = R1(p + 68);
+
+	_rate_count_vel++;
+	_rate_count_lat_lon++;
+
+
+
 
 	if ((byte & mask) == 3 || (byte & mask) == 1) {
 		_gps_position->fix_type = 3;
